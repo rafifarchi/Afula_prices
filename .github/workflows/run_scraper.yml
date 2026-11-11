@@ -1,4 +1,4 @@
-   name: Afula Prices Sync
+name: Afula Prices Sync
 
 on:
   schedule:
