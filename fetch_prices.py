@@ -14,10 +14,16 @@ def main():
     chains = ilp.list_chains()
     print(f"Checking {len(chains)} chains...")
     
-    for chain_id in chains:
+    for chain in chains:
+        # דילוג על רשתות שאינן ממומשות
+        if not getattr(chain, 'implemented', True):
+            continue
+            
+        chain_slug = chain.slug
+        print(f"Checking chain: {chain_slug} ({getattr(chain, 'name_he', '')})")
+        
         try:
-            stores_file = ilp.get_stores(chain_id)
-            print(f"Chain [{chain_id}] has {len(stores_file.stores)} stores.")
+            stores_file = ilp.get_stores(chain_slug)
             
             for store in stores_file.stores:
                 city_str = str(getattr(store, 'city', '') or '')
@@ -26,9 +32,9 @@ def main():
                 
                 # בדיקה האם עפולה מופיעה באחד השדות של הסניף
                 if target_city in city_str or target_city in address_str or target_city in store_name or "Afula" in city_str:
-                    print(f"-> Found Afula match in [{chain_id}]: ID {store.store_id} | Name: {store_name} | City: {city_str}")
+                    print(f"-> Found Afula match in [{chain_slug}]: ID {store.store_id} | Name: {store_name} | City: {city_str}")
                     
-                    prices = ilp.get_prices(chain_id, store_id=store.store_id)
+                    prices = ilp.get_prices(chain_slug, store_id=store.store_id)
                     items_data = [
                         {
                             "item_code": item.item_code,
@@ -39,7 +45,7 @@ def main():
                         for item in prices.items
                     ]
                     
-                    filename = f"{chain_id}_{store.store_id}_prices.json"
+                    filename = f"{chain_slug}_{store.store_id}_prices.json"
                     filepath = os.path.join(output_dir, filename)
                     
                     with open(filepath, 'w', encoding='utf-8') as f:
@@ -49,7 +55,7 @@ def main():
                     collected_count += 1
                     
         except Exception as e:
-            print(f"Note: Could not process chain {chain_id}: {e}")
+            print(f"Note: Could not process chain {chain_slug}: {e}")
 
     print(f"Collection completed. Total files saved: {collected_count}")
 
