@@ -20,13 +20,12 @@ def main():
             print(f"Chain [{chain_id}] has {len(stores_file.stores)} stores.")
             
             for store in stores_file.stores:
-                # נבדוק את כל השדות האפשריים לזיהוי העיר או הכתובת
                 city_str = str(getattr(store, 'city', '') or '')
                 address_str = str(getattr(store, 'address', '') or '')
                 store_name = str(getattr(store, 'store_name', '') or '')
                 
-                # נדפיס חלק מהסניפים כדי לראות איך הנתונים נראים
-                if "עפולה" in city_str or "עפולה" in address_str or "עפולה" in store_name or "Afula" in city_str:
+                # בדיקה האם עפולה מופיעה באחד השדות של הסניף
+                if target_city in city_str or target_city in address_str or target_city in store_name or "Afula" in city_str:
                     print(f"-> Found Afula match in [{chain_id}]: ID {store.store_id} | Name: {store_name} | City: {city_str}")
                     
                     prices = ilp.get_prices(chain_id, store_id=store.store_id)
